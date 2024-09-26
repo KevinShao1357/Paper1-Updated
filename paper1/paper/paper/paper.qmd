@@ -1,0 +1,135 @@
+---
+title: "Driving Speeds in Toronto Given An Incentive To Proceed Carefully"
+author: 
+  - Kevin Shao
+thanks: "Code and data used in this analysis can be found at: LINK."
+date: "27 September 2024"
+date-format: long
+abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+format: pdf
+number-sections: true
+bibliography: references.bib
+---
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+library(tidyverse)
+library(opendatatoronto)
+library(janitor)
+library(dplyr)
+library(readr)
+library(gt)
+library(AER)
+
+cleaned_data2 <- read_csv(here::here("data/analysis_data/analysis_data.csv"))
+```
+
+# Introduction
+
+Cars are one of our most frequently used transportation method, and are common for personal, military, and corporate use. There are still issues that disrupt people's everyday usage of cars, including traffic accidents, such as minor collisions as well as severe accidents with casualties, and traffic, which largely increases people's daily commuting time. In 2022, Toronto was ranked seventh in the world and first in Canada for bad traffic, and people in Toronto use 118 hours a year on Greater Toronto Area (GTA) roads due to congestion (@ctv_article), which implicates the severe traffic in this Canadian metropolitan city. It is clear that improvements on Toronto's severe congestions is meaningful for improving the city's transportation efficiency. A medium for discovering Toronto's traffic is to get data of the city's average driving speeds, as very low car speeds may reflect congestion on corresponding roads. Such a data set is also suitable for performing statistical analysis, since speeds in units of kilometers per hour (km/h) are numerical data that are easy for calculating summary statistics such as mean (average speed) and standard deviation (a measure of how spread-out numbers are for a data set).
+
+Since the aim for this study is to analyze the traffic severity in Toronto, the chosen data set should be most independent from other variables that may affect our results. Given that my chosen data is Toronto's average driving speeds, I would like to eliminate the factor of dangerous driving at high speeds. Therefore, the final choice is a dataset which records speeds at locations with existing speed display signs. At roads which have a speed display sign, there is an implication speeding here may lead to penalties, which may give drivers incentives to drive carefully and adhere to traffic rules. Therefore, this data set may avoid the disruptive variable of dangerous driving. After a thorough selection process on Open Data Toronto, the chosen data set is 'Mobile Watch Your Speed Program – Speed Summary' (@dataset).
+
+# Data
+
+## Raw Data
+
+The process of choosing this specific data set is written in the previous 'Introduction' section, and this data set is one of the few provided by Open Data Toronto which directly provides numerical data points of recorded car speeds.
+
+As mentioned in the Introduction, the data set chosen is 'Mobile Watch Your Speed Program – Speed Summary" on Open Data Toronto, which is published by Toronto Transportation Services and provides data of recorded speeds on locations where speed display signs are present. Speed display signs uses radar devices to measure speeds of oncoming cars passing through and uses LED screen to display their speeds, with the purpose of reminding drivers to obey speed limits. These speed display signs are portable and are moved around various locations across Toronto, This data set records the location of each speed display sign, the unique id of each speed display sign location, the minimum speed when the devices starts to display oncoming vehicle's speeds, various percentiles of passing vehicle's measured speeds in units of kilometers-per-hour (km/h), as well as the number of vehicles with recorded speeds within various five kilometer-per-hour intervals (@dataset).
+
+The data set is cleaned and tested using the approach described in the following 'Data Processing' section. All data cleaning and analysis are performed by programming in R language (@R). In this study, the following R packages are used: tidyverse (@tidyverse), readr (@readr), dplyr (@dplyr), janitor (@janitor), ggplot2 (@ggplot2), knitr (@knitr), opendatatoronto (@OpenDataToronto), and tibble (@tibble).
+
+## Data Processing
+
+After choosing the suitable data set provided by Open Data Toronto 'Mobile Watch Your Speed Program - Speed Summary' (@dataset), I first downloaded the data using the R package opendatatoronto (@OpenDataToronto), and saved my file into my main R studio folder by using the function 'read_csv'. I then hide the column types of the raw data, and cleaned the names in the previously-saved raw data. Next, I used the R's 'select' function to only select the location id, installation date, and mean recorded speed columns, and confirmed that each average speed corresponds with a valid location id. Therefore, I only need to leave the single columns displaying average speeds for producing graphs and tables, so I only selected the corresponding 'pct_50' column. I then chose a more common name 'mean_speed' for the column, and finally saved the new file as 'analysis_data'.
+
+After finishing data cleaning, I need to make sure all the elements of the data are valid speeds. I performed this data testing process by checking if there are any negative values, NA values, and if all elements are numeric. I confirmed that the elements are of correct format, so there is no need to change anything in 'analysis_data'. A sample of the final processed data is shown in Table 1 below.@tbl-sample1
+
+```{r}
+
+#| label: tbl-sample1
+#| fig-cap: "Table 1: Sample Data of Average Recorded Speeds of Oncoming Vehicles"
+#| echo: false
+
+raw_table <-
+  gt(cleaned_data2[1:10,]) |> cols_label(mean_speed = "Mean Speeds (km/h)")
+
+
+```
+
+Talk more about it.
+
+And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
+
+```{r}
+#| label: fig-planes
+#| fig-cap: Relationship between wing length and width
+#| echo: false
+#| warning: false
+#| message: false
+
+analysis_data <- read_csv(here::here("data/analysis_data/analysis_data.csv"))
+
+analysis_data |> 
+  ggplot(aes(x = width, y = length)) +
+  geom_point(alpha = 0.8) +
+  theme_minimal() +
+  labs(x = "Wing width (mm)",
+       y = "Wing length (mm)")
+```
+
+Talk way more about it.
+
+# Results
+
+Our results are summarized in @tbl-modelresults.
+
+```{r}
+#| echo: false
+#| eval: true
+#| warning: false
+#| message: false
+
+library(rstanarm)
+
+first_model <-
+  readRDS(file = here::here("models/first_model.rds"))
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| label: tbl-modelresults
+#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| warning: false
+
+modelsummary::modelsummary(
+  list(
+    "First model" = first_model
+  ),
+  statistic = "mad",
+  fmt = 2
+)
+```
+
+# Discussion
+
+## First discussion point {#sec-first-point}
+
+If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this.
+
+## Second discussion point
+
+## Third discussion point
+
+## Weaknesses and next steps
+
+Weaknesses and next steps should also be included.
+
+\newpage
+
+# References
